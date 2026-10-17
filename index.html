@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gilty | Perfume Pricing Studio</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./gift.css" />
+  <link rel="stylesheet" href="./selling.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">G</span><div><strong>GILTY</strong><small>PERFUME PRICING STUDIO</small></div></div>
+      <nav class="main-tabs" aria-label="Calculator sections"><button id="tab-cost" class="active" type="button" aria-controls="cost-view" aria-selected="true">Cost Price</button><button id="tab-selling" type="button" aria-controls="selling-view" aria-selected="false">Selling Price</button></nav>
+      <div class="top-actions"><span class="local-pill"><span></span> Local calculator</span><button id="download" class="download" type="button">↓ <span>Download Excel</span></button></div>
+    </header>
+
+    <main>
+      <div id="cost-view">
+      <section class="hero">
+        <div><div class="eyebrow">PRODUCTION PLANNER <span> /  FOUR FRAGRANCES</span></div><h1>Make every bottle count.</h1><p>Plan four perfumes at once. Change any input to see each cost and the combined requirement update instantly.</p></div>
+        <div class="hero-art" aria-hidden="true"><div class="orb orb-one"></div><div class="orb orb-two"></div><div class="bottle"><div class="bottle-cap"></div><div class="bottle-neck"></div><div class="bottle-body"><span>GILTY</span></div></div></div>
+      </section>
+
+      <section class="tax-controls" aria-label="GST display settings"><div><span class="eyebrow">PRICE DISPLAY</span><h2>View costs with or without GST</h2><p>Enter the GST percentage you want to apply to calculated product costs.</p></div><label>GST rate <span>%</span><input id="gst-rate" type="number" min="0" max="100" step="0.01" inputmode="decimal"></label><div class="tax-switch" role="group" aria-label="Price display"><button id="mode-without" type="button">Without GST</button><button id="mode-with" type="button">With GST</button></div></section>
+      <section class="summary" aria-label="Combined totals">
+        <div class="summary-card primary"><span>COMBINED TOTAL COST</span><strong id="grand-cost">—</strong><div class="price-pair"><div>Without GST <b id="grand-cost-ex">—</b></div><div>With GST <b id="grand-cost-in">—</b></div></div><small id="status">Enter the required values to see totals</small></div>
+        <div class="summary-card"><span>LOOSE 20 ML TOTAL</span><strong id="total-20">—</strong><div class="price-pair"><div>Without GST <b id="total-20-ex">—</b></div><div>With GST <b id="total-20-in">—</b></div></div></div>
+        <div class="summary-card"><span>50 ML TOTAL</span><strong id="total-50">—</strong><div class="price-pair"><div>Without GST <b id="total-50-ex">—</b></div><div>With GST <b id="total-50-in">—</b></div></div></div>
+        <div class="summary-card"><span>GIFT SETS TOTAL</span><strong id="total-gifts">—</strong><div class="price-pair"><div>Without GST <b id="total-gifts-ex">—</b></div><div>With GST <b id="total-gifts-in">—</b></div></div></div>
+      </section>
+
+      <section class="gift-panel" aria-label="Shared gift sets">
+        <div class="gift-intro"><span class="eyebrow">SHARED GIFT SET</span><h2>One of each fragrance.</h2><p>Every set uses one 20 ml bottle from each of the four perfumes. Its box is charged once for the set.</p></div>
+        <div class="gift-controls"><label>Number of gift sets<input id="gift-sets" type="number" min="0" step="1" inputmode="numeric" /></label><label>Include gift-set box?<select id="gift-boxing"><option value="">Choose</option><option value="No">No</option><option value="Yes">Yes</option></select></label><label id="gift-price-wrap">Box price per set (₹)<input id="gift-box-price" type="number" min="0" step="0.01" inputmode="decimal" /></label></div>
+        <div class="gift-result"><span>COST PER GIFT SET</span><strong id="gift-unit-cost">—</strong><small id="gift-status">Set your gift-set quantity</small><div class="gift-breakdown"><div><span>Oil used</span><b id="gift-oil-cost">—</b></div><div><span>Ethanol used</span><b id="gift-ethanol-cost">—</b></div><div><span>Four 20 ml bottles</span><b id="gift-fixed-cost">—</b></div><div><span>Gift box</span><b id="gift-box-unit">—</b></div></div></div>
+      </section>
+
+      <section class="section-head"><div><span class="eyebrow">01 / YOUR FORMULAS</span><h2>Four perfumes, one view</h2></div><p>Each gift set adds one 20 ml bottle to every perfume.</p></section>
+      <div id="perfume-grid" class="perfume-grid"></div>
+      <section class="averages-panel" aria-label="Average bottle costs"><div><span class="eyebrow">FOUR-FRAGRANCE AVERAGE</span><h2>Average cost per bottle</h2><p>Average of all four fragrances, including materials used and fixed bottle charges. Optional individual boxes are excluded.</p></div><div class="average-stat"><span>20 ML BOTTLE</span><strong id="average-20">—</strong></div><div class="average-stat"><span>50 ML BOTTLE</span><strong id="average-50">—</strong></div></section>
+
+      <section class="tester-panel" aria-label="Extra bottles from leftovers"><div class="tester-heading"><div><span class="eyebrow">02 / LEFTOVER STOCK</span><h2>Use every possible drop</h2><p>For each fragrance, make the maximum whole 50 ml bottles first. Then use what remains for as many 20 ml bottles as possible. Final oil and ethanol leftovers are shown in ml.</p></div><div class="tester-summary"><span>EXTRA BOTTLES ACROSS FOUR</span><strong id="tester-count-50">—</strong><strong id="tester-count-20">—</strong></div></div><div id="tester-grid" class="tester-grid"></div></section>
+
+      <section class="settings">
+        <div class="settings-title"><span class="eyebrow">03 / SHARED COSTS</span><h2>Production rates</h2><p>These rates apply to all four perfumes. Box prices stay specific to each perfume.</p></div>
+        <div class="settings-content"><div class="ethanol-rate"><label for="ethanol-rate">Ethanol price per litre</label><div class="money-input"><span>₹</span><input id="ethanol-rate" type="number" min="0" step="0.01" inputmode="decimal" /></div></div><div class="rates"><table><thead><tr><th>Fixed charge per piece</th><th>20 ml</th><th>50 ml</th></tr></thead><tbody id="rates-body"></tbody><tfoot><tr><td>Total per bottle</td><td id="rate-20-total"></td><td id="rate-50-total"></td></tr></tfoot></table></div></div>
+      </section>
+      <footer>Oil is bought in 0.5 kg increments and ethanol in 1 L increments per fragrance. Bottle and gift-set prices use only the materials consumed; the extra purchase remains in stock. Extra 50 ml and 20 ml bottle counts are estimates from that leftover stock and do not change costs or the original production plan. The entered GST percentage is applied to calculated prices. Rounded purchase spend is shown on each fragrance card. Total cost excludes profit. Gift-set boxes replace individual 20 ml boxes for bottles inside a set.</footer>
+      </div>
+      <div id="selling-view" hidden>
+        <section class="selling-hero"><span class="eyebrow">SELLING PRICE STUDIO</span><h1>Know what each sale earns.</h1><p>One selling price for all four fragrances in 20 ml, and one for all four in 50 ml. Prices are calculated automatically from the average cost, target margin, and selling expenses; edit them whenever you want.</p></section>
+        <section class="selling-cost-card" aria-label="Total production cost"><div class="selling-cost-intro"><span class="eyebrow">FROM COST PRICE</span><h2>Total production cost</h2><p>All planned loose bottles and gift sets, including selected boxes.</p></div><div class="selling-cost-value"><span>WITHOUT GST</span><strong id="sale-cost-ex">—</strong></div><div class="selling-cost-value with-tax"><span>WITH GST</span><strong id="sale-cost-in">—</strong></div></section>
+        <section class="selling-metrics" aria-label="Selling results"><div><span>SALES INCLUDING GST</span><strong id="sale-gross-collected">—</strong></div><div><span>GST IN SALES</span><strong id="sale-tax">—</strong></div><div><span>GROSS PROFIT</span><strong id="sale-gross-profit">—</strong></div><div class="net"><span>NET PROFIT</span><strong id="sale-net-profit">—</strong><small id="sale-net-margin">Enter selling prices to see totals</small></div></section>
+        <section class="selling-assumptions"><div class="selling-assumptions-head"><span class="eyebrow">01 / SELLING EXPENSES</span><h2>Costs around each sale</h2><p>Delivery is per sold unit. Marketing and other expenses are also per unit. Percentage fees apply to the customer price including GST.</p></div><div class="selling-fields"><label>GST rate <span>% of selling price</span><input id="sell-gst-rate" data-selling-gst type="number" min="0" max="100" step="0.01"></label><label>Target net margin <span>% of sales before GST</span><input id="sell-margin" data-selling-setting="targetMargin" type="number" min="0" max="99" step="0.1"></label><label>20 ml delivery <span>₹ / bottle</span><input id="sell-delivery20" data-selling-setting="delivery20" type="number" min="0" step="0.01"></label><label>50 ml delivery <span>₹ / bottle</span><input id="sell-delivery50" data-selling-setting="delivery50" type="number" min="0" step="0.01"></label><label>Gift-set delivery <span>₹ / set</span><input id="sell-deliveryGift" data-selling-setting="deliveryGift" type="number" min="0" step="0.01"></label><label>Marketing <span>₹ / unit</span><input id="sell-marketing" data-selling-setting="marketing" type="number" min="0" step="0.01"></label><label>Other expense <span>₹ / unit</span><input id="sell-other" data-selling-setting="other" type="number" min="0" step="0.01"></label><label>Marketplace fee <span>% of customer price</span><input id="sell-marketplace" data-selling-setting="marketplaceFee" type="number" min="0" max="100" step="0.1"></label><label>Payment fee <span>% of customer price</span><input id="sell-payment" data-selling-setting="paymentFee" type="number" min="0" max="100" step="0.1"></label></div></section>
+        <section class="section-head selling-section-head"><div><span class="eyebrow">02 / AVERAGE OF FOUR FRAGRANCES</span><h2>One price for each bottle size</h2></div><p>Cost shown is the simple average of all four, including selected individual boxes. Suggested prices also cover a more expensive current order mix.</p></section>
+        <div id="selling-grid" class="selling-grid"></div>
+        <section id="selling-gift" class="selling-gift"></section>
+        <footer>Gross profit = sales before GST minus production cost. Net profit also subtracts delivery, marketing, other expenses, marketplace fees, and payment fees. Suggested prices solve for the target net margin using the entered assumptions. This is a planning calculation; adjust the GST rate and expense assumptions to match your sales.</footer>
+      </div>
+    </main>
+  </div>
+  <script src="./seed-data.js"></script>
+  <script src="./app.js"></script>
+  <script src="./selling.js"></script>
+</body>
+</html>
