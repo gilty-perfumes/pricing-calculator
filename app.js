@@ -129,8 +129,8 @@ function renderResults(){
   $('gift-box-unit').textContent=giftUnit!==null?displayPrice(giftBox/sets):'—';
   setSummary('total-gifts',ready?sets>0?sets*giftUnit:0:null);
   $('gift-unit-cost').textContent=displayPrice(giftUnit);
-  $('average-20').textContent=all.every(r=>r.totalBottles>0&&r.base20!==null)?displayPrice(all.reduce((a,r)=>a+r.base20,0)/4):'—';
-  $('average-50').textContent=all.every(r=>r.totalBottles>0&&r.base50!==null)?displayPrice(all.reduce((a,r)=>a+r.base50,0)/4):'—';
+  $('average-20').textContent=all.every(r=>r.totalBottles>0&&r.unit20!==null)?displayPrice(all.reduce((a,r)=>a+r.unit20,0)/4):'—';
+  $('average-50').textContent=all.every(r=>r.totalBottles>0&&r.unit50!==null)?displayPrice(all.reduce((a,r)=>a+r.unit50,0)/4):'—';
   $('gift-status').textContent=sets>0?(giftBox===null?'Choose gift boxing and enter its price if needed':giftUnit===null?'Complete all four perfume formulas':`${sets} set${sets===1?'':'s'} · ${money(giftBox)} total gift boxing`):'Set your gift-set quantity';
   $('status').textContent=ready?`${active.length} perfume${active.length===1?'':'s'} · ${state.gstMode==='with'?'with':'without'} GST`:(active.length?'Complete the highlighted inputs':'Add quantities to begin');
   if(typeof renderSelling==='function')renderSelling();
@@ -143,7 +143,6 @@ document.addEventListener('click',e=>{if(e.target.id==='mode-without'||e.target.
 // Small, dependency-free XLSX writer. All exported numbers remain numeric Excel cells.
 const utf8=s=>new TextEncoder().encode(s),xml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const colName=n=>{let x=n+1,out='';while(x){x--;out=String.fromCharCode(65+x%26)+out;x=Math.floor(x/26)}return out};
-function sheetXml(rows){let body='';rows.forEach((row,ri)=>{body+=`<row r="${ri+1}">`;row.forEach((value,ci)=>{if(value===null||value===undefined||value==='')return;const ref=`${colName(ci)}${ri+1}`,head=ri===0?' s="1"':'';body+=typeof value==='number'&&Number.isFinite(value)?`<c r="${ref}"${head}><v>${value}</v></c>`:`<c r="${ref}" t="inlineStr"${head}><is><t>${xml(value)}</t></is></c>`});body+='</row>'});return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="16"/><cols><col min="1" max="1" width="28" customWidth="1"/><col min="2" max="25" width="19" customWidth="1"/></cols><sheetData>${body}</sheetData></worksheet>`}
 let crcTable;function crc32(bytes){if(!crcTable)crcTable=Array.from({length:256},(_,n)=>{let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;return c>>>0});let c=0xffffffff;for(const b of bytes)c=crcTable[(c^b)&255]^(c>>>8);return(c^0xffffffff)>>>0}
 function zip(files){
   const localParts=[],directoryParts=[];let offset=0,directorySize=0;
@@ -165,42 +164,5 @@ function zip(files){
   ev.setUint32(12,directorySize,true);ev.setUint32(16,offset,true);
   return new Blob([...localParts,...directoryParts,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
-function exportWorkbook(){
-  const results=state.perfumes.map(calculate);
-  const testers=results.map((r,i)=>calculateTester(r,state.perfumes[i]));
-  const summary=[['GILTY — Four-fragrance gift set cost plan'],['Perfume','Loose 20 ml','Gift-set 20 ml','50 ml','Total bottles','Oil used (kg)','Oil buy (kg)','Oil leftover (ml)','Ethanol used (L)','Ethanol buy (L)','Ethanol leftover (ml)','Oil cost (₹)','Ethanol cost (₹)','Used oil + ethanol (₹)','Purchase spend (₹)','Fixed charges (₹)','Individual boxes (₹)','Fragrance total (₹)','Loose 20 ml / unit (₹)','50 ml / unit (₹)','Unboxed 20 ml / unit (₹)','Unboxed 50 ml / unit (₹)']];
-  results.forEach((r,i)=>summary.push([state.perfumes[i].name,r.n20,r.sets,r.n50,r.totalBottles,r.oilKg,r.oilBuyKg,r.oilLeftMl,r.ethanolL,r.ethanolBuyL,r.ethanolLeftMl,r.oilCost,r.ethanolCost,r.ingredients,r.purchaseSpend,r.fixed,r.boxing,r.total,r.unit20,r.unit50,r.base20,r.base50]));
-  const active=results.filter(r=>r.totalBottles>0),giftBox=giftBoxCost(),ready=active.length>0&&active.every(r=>r.total!==null)&&giftBox!==null;
-  summary.push(['SHARED GIFT BOX',...Array(15).fill(null),giftBox,giftBox]);
-  summary.push(['PRODUCTION + GIFT BOX',active.reduce((a,r)=>a+(r.n20??0),0),active.reduce((a,r)=>a+(r.sets??0),0),active.reduce((a,r)=>a+(r.n50??0),0),active.reduce((a,r)=>a+r.totalBottles,0),...['oilKg','oilBuyKg','oilLeftMl','ethanolL','ethanolBuyL','ethanolLeftMl'].map(k=>active.reduce((a,r)=>a+(r[k]??0),0)),ready?active.reduce((a,r)=>a+r.oilCost,0):null,ready?active.reduce((a,r)=>a+r.ethanolCost,0):null,ready?active.reduce((a,r)=>a+r.ingredients,0):null,ready?active.reduce((a,r)=>a+r.purchaseSpend,0):null,ready?active.reduce((a,r)=>a+r.fixed,0):null,ready?active.reduce((a,r)=>a+r.boxing,0)+giftBox:null,ready?active.reduce((a,r)=>a+r.total,0)+giftBox:null]);
-  const sets=positive(state.giftSets),giftUnit=sets>0&&ready?results.reduce((a,r)=>a+r.giftContribution,0)+giftBox/sets:null;
-  const category20=ready?results.reduce((a,r)=>a+r.n20*r.unit20,0):null;
-  const category50=ready?results.reduce((a,r)=>a+r.n50*r.unit50,0):null;
-  const categoryGift=ready?sets>0?sets*giftUnit:0:null;
-  const grand=ready?category20+category50+categoryGift:null;
-  const tax=gstFactor(),taxed=n=>n!==null&&tax!==null?n*tax:null;
-  summary.push([],['CATEGORY','Without GST (₹)','With GST (₹)'],['Loose 20 ml total',category20,taxed(category20)],['50 ml total',category50,taxed(category50)],['Gift sets total',categoryGift,taxed(categoryGift)],['Grand total',grand,taxed(grand)],['Gift set cost per set',giftUnit,taxed(giftUnit)],['Average 20 ml unit, unboxed',results.every(r=>r.totalBottles>0&&r.base20!==null)?results.reduce((a,r)=>a+r.base20,0)/4:null],['Average 50 ml unit, unboxed',results.every(r=>r.totalBottles>0&&r.base50!==null)?results.reduce((a,r)=>a+r.base50,0)/4:null]);
-  summary.push([],['EXTRA BOTTLES FROM LEFTOVERS'],['Perfume','50 ml bottles first','20 ml bottles after 50 ml','Oil still left (ml)','Ethanol still left (ml)']);
-  testers.forEach((t,i)=>summary.push([state.perfumes[i].name,t.capacity50,t.capacity20,t.remainingOilMl,t.remainingEthanolMl]));
-  const inputs=[['Perfume','Oil concentration (%)','Oil price / kg (₹)','Oil density (kg/L)','Loose 20 ml bottles','50 ml bottles','Box loose bottles?','20 ml box / piece (₹)','50 ml box / piece (₹)']];
-  state.perfumes.forEach(p=>inputs.push([p.name,...['concentration','oilPrice','density','loose20','bottles50'].map(k=>positive(p[k])),p.boxing,...['box20','box50'].map(k=>positive(p[k]))]));
-  inputs.push([],['Shared gift sets',positive(state.giftSets)],['Gift box included?',state.giftBoxing],['Gift box price / set (₹)',positive(state.giftBoxPrice)],['Ethanol price / litre (₹)',positive(state.ethanol)],['GST rate (%)',positive(state.gstRate)],['Selected display',state.gstMode==='with'?'With GST':'Without GST']);
-  const rates=[['Fixed charge','20 ml (₹)','50 ml (₹)'],...state.rates.map(r=>[r.name,positive(r.ml20),positive(r.ml50)])];
-  const files=[
-    ['[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
-    ['_rels/.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
-    ['xl/workbook.xml','<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Summary" sheetId="1" r:id="rId1"/><sheet name="Inputs" sheetId="2" r:id="rId2"/><sheet name="Fixed charges" sheetId="3" r:id="rId3"/></sheets></workbook>'],
-    ['xl/_rels/workbook.xml.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
-    ['xl/styles.xml','<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF172A4A"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs></styleSheet>'],
-    ['xl/worksheets/sheet1.xml',sheetXml(summary)],['xl/worksheets/sheet2.xml',sheetXml(inputs)],['xl/worksheets/sheet3.xml',sheetXml(rates)]
-  ];
-  if(typeof sellingWorkbookRows==='function'){
-    files[0][1]=files[0][1].replace('</Types>','<Override PartName="/xl/worksheets/sheet4.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>');
-    files[2][1]=files[2][1].replace('</sheets>','<sheet name="Selling prices" sheetId="4" r:id="rId5"/></sheets>');
-    files[3][1]=files[3][1].replace('</Relationships>','<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet4.xml"/></Relationships>');
-    files.push(['xl/worksheets/sheet4.xml',sheetXml(sellingWorkbookRows())]);
-  }
-  const blob=zip(files),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Gilty-Four-Perfume-Calculator.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-$('download').addEventListener('click',exportWorkbook);renderShell();
+renderShell();
 
