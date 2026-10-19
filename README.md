@@ -8,7 +8,7 @@ A static cost and selling price calculator for four fragrances and a shared four
 
 ## Excel download
 
-The Download Excel button creates a styled snapshot of the Cost Price and Selling Price dashboards, including the four perfume cards, totals, gift set, leftover table, and selling results. Cost Price averages include selected individual boxing. The workbook contains the values shown at download time; change inputs on the website and download again for an updated snapshot.
+The Download Excel button creates a styled snapshot of the Cost Price and Selling Price dashboards, including the four perfume cards, totals, gift set, leftover table, and selling results. Cost Price averages show each bottle size both without and with the entered individual box prices. The workbook contains the values shown at download time; change inputs on the website and download again for an updated snapshot.
 
 ## GitHub Pages
 

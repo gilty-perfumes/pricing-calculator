@@ -15,7 +15,6 @@ class XlSheet{
 }
 const xValue=n=>n===null||n===undefined||Number.isNaN(n)?'—':n;
 const xSum=(items,key)=>items.reduce((sum,item)=>sum+(item[key]??0),0);
-const xAvg=(results,key)=>results.every(r=>r.totalBottles>0&&r[key]!==null)?results.reduce((sum,r)=>sum+r[key],0)/4:null;
 function xCard(sheet,left,right,top,label,base,tax){
   sheet.paint(top,left,top+3,right,xlStyles.cardFill);
   sheet.span(top,left,right,label,xlStyles.cardHead).height(top,24);
@@ -91,10 +90,15 @@ function buildCostSheet(){
       sheet.span(row,left+2,right,xValue(get(data)),style).height(row,23);
     });
   });
-  sheet.section(46,'AVERAGE COST PER BOTTLE  |  INCLUDING SELECTED INDIVIDUAL BOXING');
+  sheet.section(46,'AVERAGE COST PER BOTTLE  |  FOUR FRAGRANCES');
   sheet.span(47,1,8,'20 ML BOTTLE',xlStyles.cardHead);sheet.span(47,9,16,'50 ML BOTTLE',xlStyles.cardHead);
-  sheet.span(48,1,8,xValue(shown(xAvg(results,'unit20'))),xlStyles.heroMoney);
-  sheet.span(48,9,16,xValue(shown(xAvg(results,'unit50'))),xlStyles.heroMoney).height(48,36);
+  [[1,4,'WITHOUT BOX',averageBottleCost(results,20,false)],
+   [5,8,'WITH BOX',averageBottleCost(results,20,true)],
+   [9,12,'WITHOUT BOX',averageBottleCost(results,50,false)],
+   [13,16,'WITH BOX',averageBottleCost(results,50,true)]].forEach(([left,right,label,value])=>{
+    sheet.span(48,left,right,label,xlStyles.cardHead);
+    sheet.span(49,left,right,xValue(shown(value)),xlStyles.heroMoney);
+  });sheet.height(48,25).height(49,36);
   sheet.section(51,'EXTRA BOTTLES FROM LEFTOVER STOCK  |  50 ML FIRST, THEN 20 ML');
   const headers=[['Perfume',1,4],['50 ml bottles',5,7],['20 ml bottles',8,10],['Oil still left (ml)',11,13],['Ethanol still left (ml)',14,16]];
   headers.forEach(([label,a,b])=>sheet.span(52,a,b,label,xlStyles.tableHead));sheet.height(52,25);

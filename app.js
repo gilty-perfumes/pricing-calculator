@@ -88,6 +88,13 @@ function giftBoxCost(){
   if(state.giftBoxing==='Yes'&&price!==null)return sets*price;
   return null;
 }
+function averageBottleCost(results,size,withBox){
+  const baseKey=size===20?'base20':'base50',boxKey=size===20?'box20':'box50';
+  if(!results.every(r=>r.totalBottles>0&&r[baseKey]!==null))return null;
+  const boxes=withBox?state.perfumes.map(p=>positive(p[boxKey])):[];
+  if(withBox&&boxes.some(price=>price===null))return null;
+  return results.reduce((sum,r,i)=>sum+r[baseKey]+(withBox?boxes[i]:0),0)/4;
+}
 function renderResults(){
   const all=state.perfumes.map(calculate),sets=positive(state.giftSets),giftBox=giftBoxCost();
   const testers=all.map((r,i)=>calculateTester(r,state.perfumes[i]));
@@ -129,8 +136,10 @@ function renderResults(){
   $('gift-box-unit').textContent=giftUnit!==null?displayPrice(giftBox/sets):'—';
   setSummary('total-gifts',ready?sets>0?sets*giftUnit:0:null);
   $('gift-unit-cost').textContent=displayPrice(giftUnit);
-  $('average-20').textContent=all.every(r=>r.totalBottles>0&&r.unit20!==null)?displayPrice(all.reduce((a,r)=>a+r.unit20,0)/4):'—';
-  $('average-50').textContent=all.every(r=>r.totalBottles>0&&r.unit50!==null)?displayPrice(all.reduce((a,r)=>a+r.unit50,0)/4):'—';
+  for(const size of [20,50]){
+    $(`average-${size}-no-box`).textContent=displayPrice(averageBottleCost(all,size,false));
+    $(`average-${size}-with-box`).textContent=displayPrice(averageBottleCost(all,size,true));
+  }
   $('gift-status').textContent=sets>0?(giftBox===null?'Choose gift boxing and enter its price if needed':giftUnit===null?'Complete all four perfume formulas':`${sets} set${sets===1?'':'s'} · ${money(giftBox)} total gift boxing`):'Set your gift-set quantity';
   $('status').textContent=ready?`${active.length} perfume${active.length===1?'':'s'} · ${state.gstMode==='with'?'with':'without'} GST`:(active.length?'Complete the highlighted inputs':'Add quantities to begin');
   if(typeof renderSelling==='function')renderSelling();
